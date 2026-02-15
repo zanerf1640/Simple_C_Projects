@@ -20,6 +20,7 @@ Author: Zane Francis
 typedef enum{
     OP_HALT = 0,
     OP_LOAD,
+    OP_PRINT,
     OP_ADD,
     OP_SUB,
     OP_MUL,
@@ -28,7 +29,6 @@ typedef enum{
     OP_JZ,
     OP_PUSH,
     OP_POP,
-    OP_PRINT
 }Opcode;
 
 // Define the structure of the virtual machine

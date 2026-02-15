@@ -58,14 +58,14 @@ void vm_execute(VirtualMachine *vm) {
     while (vm->running) {
         // Fetch Opcode
         uint8_t opcode = vm->memory[vm->pc++];
-        // Conditional for each operand
-        switch (opcode) {
 
+        switch (opcode) {
+            // Case for ending the virtual machine
             case OP_HALT:
                 vm->running = 0;
                 break;
-            
-            case OP_LOAD:
+            //Case for loading the registers and values
+            case OP_LOAD: {
                 // Fetch register number and value
                 uint8_t reg = vm->memory[vm->pc++];
                 uint8_t value = vm->memory[vm->pc++];
@@ -79,7 +79,123 @@ void vm_execute(VirtualMachine *vm) {
                 // Add register value to register
                 vm->registers[reg] = value;
                 break;
-        }
+            }
+            // Case for printing
+            case OP_PRINT: {
+                // Fetch register number
+                uint8_t reg = vm->memory[vm->pc++];
 
+                // Saftey check for register
+                if (reg >= NUM_REGISTERS) {
+                    fprintf(stderr, "Error, Invalid register %d\n", reg);
+                    vm->running = 0;
+                    break;
+                }
+                // Print value in register
+                fprintf(stderr, "Register value: %d", vm->registers[reg]);                
+                break;
+            }
+            // Case for addition
+            case OP_ADD: {
+                // Fetch registers
+                uint8_t fir_reg = vm->memory[vm->pc++];
+                uint8_t sec_reg = vm->memory[vm->pc++];
+                uint8_t des_reg = vm->memory[vm->pc++];
+
+                // Saftey check for registers
+                if (fir_reg >= NUM_REGISTERS || sec_reg >= NUM_REGISTERS || des_reg >= NUM_REGISTERS) {
+                    fprintf(stderr, "Error, Invalid register %d or %d or %d\n",
+                        fir_reg, sec_reg, des_reg);
+                    vm->running = 0;
+                    break;
+                }
+                // Add first and second reg and store in destintaion reg 
+                vm->registers[des_reg] = vm->registers[fir_reg] + vm->registers[sec_reg];
+                break;
+            }
+            // Case for subtraction
+            case OP_SUB: {
+                // Fetch registers
+                uint8_t fir_reg = vm->memory[vm->pc++];
+                uint8_t sec_reg = vm->memory[vm->pc++];
+                uint8_t des_reg = vm->memory[vm->pc++];
+
+                // Safety check for registers
+                if (fir_reg >= NUM_REGISTERS || sec_reg >= NUM_REGISTERS || des_reg >= NUM_REGISTERS) {
+                    fprintf(stderr, "Error, Invalid register %d or %d or %d\n", 
+                        fir_reg, sec_reg, des_reg);
+                    vm->running = 0;
+                    break;
+                }
+
+                // Substract second from first reg and store in destination reg
+                vm->registers[des_reg] = vm->registers[fir_reg] - vm->registers[sec_reg];
+                break;
+            }
+            // Case for multiplication
+            case OP_MUL: {
+                // Fetch registers
+                uint8_t fir_reg = vm->memory[vm->pc++];
+                uint8_t sec_reg = vm->memory[vm->pc++];
+                uint8_t des_reg = vm->memory[vm->pc++];
+                
+                // Safety check for registers
+                if (fir_reg >= NUM_REGISTERS || sec_reg >= NUM_REGISTERS || des_reg >= NUM_REGISTERS) {
+                    fprintf(stderr, "Error, invalid register %d or %d or %d\n", 
+                        fir_reg, sec_reg, des_reg);
+                    vm->running = 0;
+                    break;
+                }
+
+                // Multiply first and second reg and store in destination reg
+                vm->registers[des_reg] = vm->registers[fir_reg] * vm->registers[sec_reg];
+                break;
+            }
+            // Case for division
+            case OP_DIV: {
+                // Fetch registers
+                uint8_t fir_reg = vm->memory[vm->pc++];
+                uint8_t sec_reg = vm->memory[vm->pc++];
+                uint8_t des_reg = vm->memory[vm->pc++];
+
+                // Safety check for registers
+                if (fir_reg >= NUM_REGISTERS || sec_reg >= NUM_REGISTERS || des_reg >= NUM_REGISTERS) {
+                    fprintf(stderr, "Error, Invalid register %d or %d or %d\n", 
+                        fir_reg, sec_reg, des_reg);
+                    vm->running = 0;
+                    break;
+                }
+                if (vm->registers[sec_reg] == 0) {
+                    fprintf(stderr, "Error, can not divide when register %d is 0.\n", sec_reg);
+                    vm->running = 0;
+                    break;
+                }
+
+                // Divide the second reg from the first and store in destination reg
+                vm->registers[des_reg] = vm->registers[fir_reg] / vm->registers[sec_reg];
+                break;
+            }
+            // Case for jumping to register
+            case OP_JMP: {
+                // Fetch the address of the register to jump to
+                uint8_t high_byte = vm->memory[vm->pc++];
+                uint8_t low_byte = vm->memory[vm->pc++];
+                uint16_t address = (high_byte << 8) | low_byte;
+                
+                if (address >= MEMORY_SIZE) {
+                    fprintf(stderr, "Error invalid address %d\n", address);
+                    vm->running = 0;
+                    break;
+                }
+
+                // Jump to register
+                vm->pc = address;
+                break;
+            }
+            // Case for jumping to zero
+            case OP_JZ: {
+                
+            }
+        }
     }
 }
