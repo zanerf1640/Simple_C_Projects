@@ -288,7 +288,7 @@ int main() {
     VirtualMachine vm;
     // Initialize Virtual Machine
     vm_init(&vm);
-    // Simple test program
+    // Simple test program (Change this to whatever you want your program to do)
     uint8_t program[] = {
         OP_LOAD, 0, 5,
         OP_LOAD, 1, 3,
